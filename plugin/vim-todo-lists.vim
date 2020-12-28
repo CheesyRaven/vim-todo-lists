@@ -35,7 +35,11 @@ function! VimTodoListsInit()
   endif
 
   if !exists('g:VimTodoListsDatesFormat')
-    let g:VimTodoListsDatesFormat = "%X, %d %b %Y"
+    let g:VimTodoListsDatesFormat = "\@CREATED %X, %d %b %Y"
+  endif
+
+  if !exists('g:VimTodoListsCompletedDatesFormat')
+    let g:VimTodoListsCompletedDatesFormat = "\@COMPLETED %X, %d %b %Y"
   endif
 
   setlocal tabstop=2
@@ -61,14 +65,14 @@ endfunction
 
 " Initializes done/undone tokens
 function! VimTodoListsInitializeTokens()
-  let g:VimTodoListsEscaped = '*[]'
+  let g:VimTodoListsEscaped = '✘'
 
   if !exists('g:VimTodoListsUndoneItem')
-    let g:VimTodoListsUndoneItem = '- [ ]'
+    let g:VimTodoListsUndoneItem = '☐'
   endif
 
   if !exists('g:VimTodoListsDoneItem')
-    let g:VimTodoListsDoneItem = '- [X]'
+    let g:VimTodoListsDoneItem = '✔'
   endif
 
   let g:VimTodoListsDoneItemEscaped = escape(g:VimTodoListsDoneItem, g:VimTodoListsEscaped)
@@ -90,6 +94,7 @@ endfunction
 function! VimTodoListsSetItemDone(lineno)
   let l:line = getline(a:lineno)
   call setline(a:lineno, substitute(l:line, '^\(\s*\)'.g:VimTodoListsUndoneItemEscaped, '\1'.g:VimTodoListsDoneItem, ''))
+  call VimTodoListsAppendCompletedDate()
 endfunction
 
 
@@ -380,10 +385,18 @@ function! VimTodoListsSetItemMode()
   inoremap <buffer><silent> <S-Tab> <ESC>:VimTodoListsDecreaseIndent<CR>A
 endfunction
 
-" Appends date at the end of the line
+" Appends date at the end of the line when an item is created
 function! VimTodoListsAppendDate()
   if(g:VimTodoListsDatesEnabled == 1)
     let l:date = strftime(g:VimTodoListsDatesFormat)
+    execute "s/$/ (" . l:date . ")"
+  endif
+endfunction
+
+" Appends date at the end of the line when an item is completed
+function! VimTodoListsAppendCompletedDate()
+  if(g:VimTodoListsDatesEnabled == 1)
+    let l:date = strftime(g:VimTodoListsCompletedDatesFormat)
     execute "s/$/ (" . l:date . ")"
   endif
 endfunction
