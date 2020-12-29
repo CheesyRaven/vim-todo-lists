@@ -79,16 +79,20 @@ function! VimTodoListsInitializeTokens()
   let g:VimTodoListsUndoneItemEscaped = escape(g:VimTodoListsUndoneItem, g:VimTodoListsEscaped)
 endfunction
 
-" Initiaizes syntax
+" Initializes syntax
 function! VimTodoListsInitializeSyntax()
-  execute("syntax match vimTodoListsDone '^\\s*".g:VimTodoListsDoneItemEscaped.".*'")
-  execute("syntax match vimTodoListsNormal '^\\s*".g:VimTodoListsUndoneItemEscaped.".*'")
-  execute("syntax match vimTodoListsImportant '^\\s*".g:VimTodoListsUndoneItemEscaped."\\s*!.*'")
-
-  highlight link vimTodoListsDone Comment
-  highlight link vimTodoListsNormal Normal
-  highlight link vimTodoListsImportant Underlined
+  syn match doneCheck /✔/
+  syn match todoCheck /☐/
+  syn match todoHeader /^.*:\n/
+  syn region timeStamp start="(@" end=")"
+  syntax region todoDone start="✔" end="\n" contains=timeStamp,doneCheck
+  highlight link doneCheck Statement
+  highlight link todoCheck Number
+  highlight link todoHeader String
+  highlight link timeStamp Function
+  highlight link todoDone Comment
 endfunction
+
 
 " Sets the item done
 function! VimTodoListsSetItemDone(lineno)
