@@ -27,7 +27,7 @@ function! VimTodoListsInit()
 
   " Keep the same indent as on the current line or always makes a root item
   if !exists('g:VimTodoListsKeepSameIndent')
-    let g:VimTodoListsKeepSameIndent = 1
+    let g:VimTodoListsKeepSameIndent = 0
   endif
 
   if !exists('g:VimTodoListsDatesEnabled')
