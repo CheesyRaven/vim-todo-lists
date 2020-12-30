@@ -478,11 +478,13 @@ function! VimTodoListsToggleItem()
   let l:cursor_pos = getcurpos()
 
   if VimTodoListsItemIsNotDone(l:line) == 1
-    call VimTodoListsForEachChild(l:lineno, 'VimTodoListsSetItemDone')
-    call VimTodoListsMoveSubtreeDown(l:lineno)
+    call VimTodoListsSetItemDone(l:lineno)
+"    call VimTodoListsForEachChild(l:lineno, 'VimTodoListsSetItemDone')
+"    call VimTodoListsMoveSubtreeDown(l:lineno)
   elseif VimTodoListsItemIsDone(l:line) == 1
-    call VimTodoListsForEachChild(l:lineno, 'VimTodoListsSetItemNotDone')
-    call VimTodoListsMoveSubtreeUp(l:lineno)
+    call VimTodoListsSetItemNotDone(l:lineno)
+"    call VimTodoListsForEachChild(l:lineno, 'VimTodoListsSetItemNotDone')
+"    call VimTodoListsMoveSubtreeUp(l:lineno)
   endif
 
 " Function is currently causing issues with date/project appending, disabling for now
