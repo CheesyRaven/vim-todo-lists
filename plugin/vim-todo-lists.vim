@@ -99,6 +99,8 @@ function! VimTodoListsSetItemDone(lineno)
   let l:line = getline(a:lineno)
   call setline(a:lineno, substitute(l:line, '^\(\s*\)'.g:VimTodoListsUndoneItemEscaped, '\1'.g:VimTodoListsDoneItem, ''))
   call VimTodoListsAppendCompletedDate()
+"  call VimTodoListsGetHeader(l:line)
+  execute "s/$/ (" . getline(VimTodoListsGetHeader(a:lineno)) . ")"
 endfunction
 
 
@@ -288,6 +290,22 @@ function! VimTodoListsFindParent(lineno)
   return l:parent_lineno
 endfunction
 
+" Returns the header line
+function! VimTodoListsGetHeader(lineno)
+  let l:indent = VimTodoListsCountLeadingSpaces(getline(a:lineno))
+  let l:parent_lineno = -1
+
+  for current_line in range(a:lineno, 1, -1)
+    if ((match(current_line, ':\n')) &&
+      \ VimTodoListsCountLeadingSpaces(getline(current_line)) < l:indent)
+      let l:parent_lineno = current_line
+      break
+    endif
+  endfor
+
+  return l:parent_lineno
+endfunction
+
 
 " Returns the line number of the last child
 function! VimTodoListsFindLastChild(lineno)
@@ -310,7 +328,6 @@ function! VimTodoListsFindLastChild(lineno)
 
   return l:last_child_lineno
 endfunction
-
 
 " Marks the parent done if all children are done
 function! VimTodoListsUpdateParent(lineno)
@@ -468,7 +485,8 @@ function! VimTodoListsToggleItem()
     call VimTodoListsMoveSubtreeUp(l:lineno)
   endif
 
-  call VimTodoListsUpdateParent(l:lineno)
+" Function is currently causing issues with date/project appending, disabling for now
+"  call VimTodoListsUpdateParent(l:lineno)
 
   " Restore the current position
   " Using the {curswant} value to set the proper column
