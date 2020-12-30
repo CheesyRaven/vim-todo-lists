@@ -20,7 +20,6 @@
 " FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 " IN THE SOFTWARE.
 
-
 " Initializes plugin settings and mappings
 function! VimTodoListsInit()
   set filetype=todo
@@ -63,6 +62,19 @@ function! VimTodoListsInit()
   endif
 endfunction
 
+" initialize Python functions import
+let s:plugin_root_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
+python3 << EOF
+import sys
+from os.path import normpath, join
+import vim
+plugin_root_dir = vim.eval('s:plugin_root_dir')
+python_root_dir = normpath(join(plugin_root_dir, '..', 'python'))
+sys.path.insert(0, python_root_dir)
+import sample
+EOF
+
 " Initializes done/undone tokens
 function! VimTodoListsInitializeTokens()
   let g:VimTodoListsEscaped = '✘'
@@ -99,7 +111,6 @@ function! VimTodoListsSetItemDone(lineno)
   let l:line = getline(a:lineno)
   call setline(a:lineno, substitute(l:line, '^\(\s*\)'.g:VimTodoListsUndoneItemEscaped, '\1'.g:VimTodoListsDoneItem, ''))
   call VimTodoListsAppendCompletedDate()
-"  call VimTodoListsGetHeader(l:line)
   execute "s/$/ (" . getline(VimTodoListsGetHeader(a:lineno)) . ")"
 endfunction
 
@@ -120,6 +131,17 @@ function! VimTodoListsLineIsItem(line)
   return 0
 endfunction
 
+" Checks that line is a header item
+function! VimTodoListsLineIsHeader(line)
+python3 << EOF
+import vim
+currentLine = vim.eval("a:line")
+pyResult = sample.find_header_line(currentLine)
+EOF
+  let TestResult = py3eval("pyResult")
+"  echom "Python Variable in Vim: ".TestResult
+  return TestResult
+endfunction
 
 " Checks that item is not done
 function! VimTodoListsItemIsNotDone(line)
@@ -296,8 +318,14 @@ function! VimTodoListsGetHeader(lineno)
   let l:parent_lineno = -1
 
   for current_line in range(a:lineno, 1, -1)
-    if ((match(current_line, ':\n')) &&
+"    if ((match(current_line, ':\n')) &&
+"    echom "testing base function: ".VimTodoListsLineIsHeader("test:")
+"    echom "The current line is".current_line
+"    echom "The evaluation of the current line is".VimTodoListsLineIsHeader(getline(current_line))
+    if ((VimTodoListsLineIsHeader(getline(current_line)) == "pass") &&
       \ VimTodoListsCountLeadingSpaces(getline(current_line)) < l:indent)
+"      echom "The successful line is ".getline(current_line)
+"      echom VimTodoListsLineIsHeader(getline(current_line))
       let l:parent_lineno = current_line
       break
     endif
@@ -381,8 +409,8 @@ function! VimTodoListsSetNormalMode()
   nunmap <buffer> k
   iunmap <buffer> <CR>
   iunmap <buffer> <kEnter>
-  nnoremap <buffer><silent> <Space> :VimTodoListsToggleItem<CR>
-  vnoremap <buffer><silent> <Space> :'<,'>VimTodoListsToggleItem<CR>
+  nnoremap <buffer> <Space> :VimTodoListsToggleItem<CR>
+  vnoremap <buffer> <Space> :'<,'>VimTodoListsToggleItem<CR>
   noremap <buffer><silent> <leader>e :silent call VimTodoListsSetItemMode()<CR>
 endfunction
 
@@ -393,8 +421,8 @@ function! VimTodoListsSetItemMode()
   nnoremap <buffer><silent> O :VimTodoListsCreateNewItemAbove<CR>
   nnoremap <buffer><silent> j :VimTodoListsGoToNextItem<CR>
   nnoremap <buffer><silent> k :VimTodoListsGoToPreviousItem<CR>
-  nnoremap <buffer><silent> <Space> :VimTodoListsToggleItem<CR>
-  vnoremap <buffer><silent> <Space> :VimTodoListsToggleItem<CR>
+  nnoremap <buffer> <Space> :VimTodoListsToggleItem<CR>
+  vnoremap <buffer> <Space> :VimTodoListsToggleItem<CR>
   inoremap <buffer><silent> <CR> <ESC>:call VimTodoListsAppendDate()<CR>:silent call VimTodoListsCreateNewItemBelow()<CR>
   inoremap <buffer><silent> <kEnter> <ESC>:call VimTodoListsAppendDate()<CR>A<CR><ESC>:VimTodoListsCreateNewItem<CR>
   noremap <buffer><silent> <leader>e :silent call VimTodoListsSetNormalMode()<CR>
