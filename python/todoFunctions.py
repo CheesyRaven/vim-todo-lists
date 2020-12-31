@@ -20,7 +20,7 @@ def archive_line_exists():
         # adds completed task lines to completed_tasks list
         if '✔' in line:
             completed_tasks.append(i)
-    if not archive_line:
+    if archive_line is None:
         lines.append("") #cannot append newline characters
         lines.append("")
         lines.append("_____ARCHIVE_____")
