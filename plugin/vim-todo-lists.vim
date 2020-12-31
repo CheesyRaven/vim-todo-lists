@@ -407,6 +407,7 @@ function! VimTodoListsSetNormalMode()
   nunmap <buffer> O
   nunmap <buffer> j
   nunmap <buffer> k
+  nunmap <buffer> <leader>a
   iunmap <buffer> <CR>
   iunmap <buffer> <kEnter>
   nnoremap <buffer> <Space> :VimTodoListsToggleItem<CR>
@@ -421,6 +422,8 @@ function! VimTodoListsSetItemMode()
   nnoremap <buffer><silent> O :VimTodoListsCreateNewItemAbove<CR>
   nnoremap <buffer><silent> j :VimTodoListsGoToNextItem<CR>
   nnoremap <buffer><silent> k :VimTodoListsGoToPreviousItem<CR>
+  nnoremap <buffer> <leader>a :call TodoArchive()<CR>
+  vnoremap <buffer> <leader>a :call TodoArchive()<CR>
   nnoremap <buffer> <Space> :VimTodoListsToggleItem<CR>
   vnoremap <buffer> <Space> :VimTodoListsToggleItem<CR>
   inoremap <buffer><silent> <CR> <ESC>:call VimTodoListsAppendDate()<CR>:silent call VimTodoListsCreateNewItemBelow()<CR>
@@ -539,10 +542,6 @@ python3 << EOF
 import vim
 todoFunctions.archive_line_exists()
 EOF
-"  let TestResult = py3eval("ArchiveLineNo")
-"  echom "Python Variable in Vim: ".TestResult
-"  return TestResult
-
 endfunction
 
 

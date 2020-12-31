@@ -21,6 +21,8 @@ def archive_line_exists():
         if '✔' in line:
             completed_tasks.append(i)
     if not archive_line:
+        lines.append("") #cannot append newline characters
+        lines.append("")
         lines.append("_____ARCHIVE_____")
         archive_line = len(vim.current.buffer)
 
