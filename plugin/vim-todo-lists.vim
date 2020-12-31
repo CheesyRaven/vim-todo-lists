@@ -72,7 +72,7 @@ import vim
 plugin_root_dir = vim.eval('s:plugin_root_dir')
 python_root_dir = normpath(join(plugin_root_dir, '..', 'python'))
 sys.path.insert(0, python_root_dir)
-import sample
+import todoFunctions
 EOF
 
 " Initializes done/undone tokens
@@ -136,7 +136,7 @@ function! VimTodoListsLineIsHeader(line)
 python3 << EOF
 import vim
 currentLine = vim.eval("a:line")
-pyResult = sample.find_header_line(currentLine)
+pyResult = todoFunctions.find_header_line(currentLine)
 EOF
   let TestResult = py3eval("pyResult")
 "  echom "Python Variable in Vim: ".TestResult
@@ -532,6 +532,20 @@ endfunction
 function! VimTodoListsDecreaseIndent()
   normal! <<6l
 endfunction
+
+" Function to archive all completed items
+function! TodoArchive()
+python3 << EOF
+import vim
+todoFunctions.archive_line_exists()
+EOF
+"  let TestResult = py3eval("ArchiveLineNo")
+"  echom "Python Variable in Vim: ".TestResult
+"  return TestResult
+
+endfunction
+
+
 
 "Plugin startup code
 if !exists('g:vimtodolists_plugin')
