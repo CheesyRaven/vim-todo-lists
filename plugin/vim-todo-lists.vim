@@ -96,6 +96,7 @@ function! VimTodoListsInitializeSyntax()
   syn match doneCheck /✔/
   syn match todoCheck /☐/
   syn match todoHeader /^.*:\n/
+  syn match archiveHeader /_____ARCHIVE_____/
   syn region timeStamp start="(@" end=")"
   syntax region todoDone start="✔" end="\n" contains=timeStamp,doneCheck
   highlight link doneCheck Statement
@@ -103,6 +104,7 @@ function! VimTodoListsInitializeSyntax()
   highlight link todoHeader String
   highlight link timeStamp Function
   highlight link todoDone Comment
+  highlight link archiveHeader Identifier
 endfunction
 
 

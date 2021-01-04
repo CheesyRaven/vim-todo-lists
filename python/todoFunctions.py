@@ -10,11 +10,12 @@ def find_header_line(line):
 def archive_line_exists():
     lines = vim.current.buffer
     completed_tasks = []
+    archive_header = "_____ARCHIVE_____"
     archive_line = None
     # Check to see if there is an archive line. If yes, save line number, else
     # create archive line
     for i, line in enumerate(lines):
-        if "_____ARCHIVE_____" in line:
+        if archive_header in line:
             archive_line = i + 1 #vim.current.buffer indexes starting at 1
             break
         # adds completed task lines to completed_tasks list
@@ -23,7 +24,7 @@ def archive_line_exists():
     if archive_line is None:
         lines.append("") #cannot append newline characters
         lines.append("")
-        lines.append("_____ARCHIVE_____")
+        lines.append(archive_header)
         archive_line = len(vim.current.buffer)
 
     # reverses the order of the completed tasks to ensure as they are removed
@@ -34,5 +35,7 @@ def archive_line_exists():
     # then delete those lines from the active tasks area
     for task in completed_tasks:
         lines.append(lines[task].lstrip(), archive_line)
+    # Separate for loops so the tasks are appended in order, then deleted
+    # correctly
+    for task in completed_tasks:
         del lines[task]
-
