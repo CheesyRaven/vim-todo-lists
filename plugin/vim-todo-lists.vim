@@ -75,6 +75,19 @@ sys.path.insert(0, python_root_dir)
 import todoFunctions
 EOF
 
+" " Python function to check for the existence of a tag in the current line
+function! ContainsTag(tag)
+python3 << EOF
+import vim
+py_tag = vim.eval("a:tag")
+check_tag = todoFunctions.line_contains_tag(py_tag)
+EOF
+  let Result = py3eval("check_tag")
+  return Result
+endfunction
+
+
+
 " Initializes done/undone tokens
 function! VimTodoListsInitializeTokens()
   let g:VimTodoListsEscaped = '✘'
@@ -113,7 +126,9 @@ function! VimTodoListsSetItemDone(lineno)
   let l:line = getline(a:lineno)
   call setline(a:lineno, substitute(l:line, '^\(\s*\)'.g:VimTodoListsUndoneItemEscaped, '\1'.g:VimTodoListsDoneItem, ''))
   call VimTodoListsAppendCompletedDate()
-  execute "s/$/ (" . getline(VimTodoListsGetHeader(a:lineno)) . ")"
+  if (ContainsTag('@PROJECT') == 'fail')
+    execute "s/$/ (@PROJECT " . getline(VimTodoListsGetHeader(a:lineno)) . ")"
+  endif
 endfunction
 
 
@@ -141,7 +156,6 @@ currentLine = vim.eval("a:line")
 pyResult = todoFunctions.find_header_line(currentLine)
 EOF
   let TestResult = py3eval("pyResult")
-"  echom "Python Variable in Vim: ".TestResult
   return TestResult
 endfunction
 
@@ -320,14 +334,8 @@ function! VimTodoListsGetHeader(lineno)
   let l:parent_lineno = -1
 
   for current_line in range(a:lineno, 1, -1)
-"    if ((match(current_line, ':\n')) &&
-"    echom "testing base function: ".VimTodoListsLineIsHeader("test:")
-"    echom "The current line is".current_line
-"    echom "The evaluation of the current line is".VimTodoListsLineIsHeader(getline(current_line))
     if ((VimTodoListsLineIsHeader(getline(current_line)) == "pass") &&
       \ VimTodoListsCountLeadingSpaces(getline(current_line)) < l:indent)
-"      echom "The successful line is ".getline(current_line)
-"      echom VimTodoListsLineIsHeader(getline(current_line))
       let l:parent_lineno = current_line
       break
     endif
@@ -441,7 +449,8 @@ endfunction
 
 " Appends date at the end of the line when an item is created
 function! VimTodoListsAppendDate()
-  if(g:VimTodoListsDatesEnabled == 1)
+  if(g:VimTodoListsDatesEnabled == 1 && VimTodoListsLineIsHeader(getline('.')) == 'fail'
+        \ && ContainsTag('@CREATED') == 'fail')
     let l:date = strftime(g:VimTodoListsDatesFormat)
     execute "s/$/ (" . l:date . ")"
   endif
@@ -449,7 +458,7 @@ endfunction
 
 " Appends date at the end of the line when an item is completed
 function! VimTodoListsAppendCompletedDate()
-  if(g:VimTodoListsDatesEnabled == 1)
+  if(g:VimTodoListsDatesEnabled == 1 && ContainsTag('@COMPLETED') == 'fail')
     let l:date = strftime(g:VimTodoListsCompletedDatesFormat)
     execute "s/$/ (" . l:date . ")"
   endif

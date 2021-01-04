@@ -1,5 +1,11 @@
 import vim
 
+def line_contains_tag(tag):
+    if tag in vim.current.line:
+        return "pass"
+    else:
+        return "fail"
+
 def find_header_line(line):
     result = line.endswith(':')
     if result:
@@ -39,3 +45,5 @@ def archive_line_exists():
     # correctly
     for task in completed_tasks:
         del lines[task]
+
+
