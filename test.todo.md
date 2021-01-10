@@ -5,3 +5,5 @@ This is a test project:
     ☐ Subtask 1 (@CREATED 12:47:41, 30 Dec 2020)
     ☐ Subtask 2 (@CREATED 12:47:44, 30 Dec 2020)
     ☐ Subtask 3 (@CREATED 12:47:46, 30 Dec 2020)
+  ☐  (@CREATED 16:09:31, 04 Jan 2021)
+  ☐  (@CREATED 16:09:32, 04 Jan 2021)

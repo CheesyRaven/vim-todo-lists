@@ -75,7 +75,7 @@ sys.path.insert(0, python_root_dir)
 import todoFunctions
 EOF
 
-" " Python function to check for the existence of a tag in the current line
+" Python function to check for the existence of a tag in the current line
 function! ContainsTag(tag)
 python3 << EOF
 import vim
@@ -111,6 +111,15 @@ function! VimTodoListsInitializeSyntax()
   syn match todoHeader /^.*:\n/
   syn match archiveHeader /_____ARCHIVE_____/
   syn region timeStamp start="(@" end=")"
+  syn include @Javascript syntax/javascript.vim
+  unlet b:current_syntax
+  syn include @Python syntax/python.vim
+  unlet b:current_syntax
+  syn include @Bash syntax/bash.vim
+  unlet b:current_syntax
+  syntax region jsCode start="```js" keepend end="```" contains=@Javascript
+  syntax region pythonCode start="```py" keepend end="```" contains=@Python
+  syntax region bashCode start="```sh" keepend end="```" contains=@Bash
   syntax region todoDone start="✔" end="\n" contains=timeStamp,doneCheck
   highlight link doneCheck Statement
   highlight link todoCheck Number
@@ -119,7 +128,6 @@ function! VimTodoListsInitializeSyntax()
   highlight link todoDone Comment
   highlight link archiveHeader Identifier
 endfunction
-
 
 " Sets the item done
 function! VimTodoListsSetItemDone(lineno)
@@ -428,6 +436,7 @@ endfunction
 
 " Sets mappings for faster item navigation and editing
 function! VimTodoListsSetItemMode()
+  nnoremap <buffer><silent> <leader>l :call VimTodoListsCreateNewItem()<CR><ESC>
   nnoremap <buffer><silent> o :VimTodoListsCreateNewItemBelow<CR>
   nnoremap <buffer><silent> O :VimTodoListsCreateNewItemAbove<CR>
   nnoremap <buffer><silent> j :VimTodoListsGoToNextItem<CR>
